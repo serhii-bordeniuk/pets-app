@@ -1,0 +1,35 @@
+@mixin menu-button-styles {
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 400;
+    color: $main-color;
+    width: 272px;
+    height: 69px;
+    border-radius: 20px;
+    background-color: $secondary-color;
+    border: none;
+    position: relative;
+    &:hover {
+        background-color: #ffff;
+    }
+    .MuiSvgIcon-root {
+        width: 53px;
+        height: 53px;
+        vertical-align: middle;
+        position: absolute;
+        left: 9px;
+        top: 9px;
+    }
+}
+
+@mixin text-input-styles {
+    .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+        border-color: $main-color;
+    }
+
+    .MuiInputLabel-root.Mui-focused,
+    .MuiInputLabel-root.MuiInputLabel-shrink {
+        color: $main-color;
+    }
+}

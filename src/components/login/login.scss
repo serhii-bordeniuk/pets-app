@@ -1,0 +1,81 @@
+@import "../../style/variables.scss";
+@import "../../style/mixins.scss";
+
+.login {
+    height: 100vh;
+    width: 50%;
+    .loginForm {
+        gap: 20px;
+        max-width: 612px;
+        display: flex;
+        flex-direction: column;
+        padding: 30px;
+        margin: auto;
+        margin-top: 277px;
+
+        .loginFormTitle {
+            text-align: center;
+            font-weight: 800;
+            font-size: 48px;
+            line-height: 65px;
+        }
+
+        @include text-input-styles;
+
+        .submitButton {
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 18px;
+            line-height: 26px;
+            height: 56px;
+            width: 100%;
+            background-color: $main-color;
+        }
+        .MuiButton-root:hover {
+            transform: scale(1.02);
+            background-color: $main-color;
+        }
+        .registrationLink {
+            color: $main-color;
+            font-size: 18px;
+            text-align: center;
+            .registrationLinkButton {
+                text-decoration: none;
+                color: $main-color;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+@media (max-width: 2560px) {
+    .login {
+        .mainlogoWrapper {
+            display: none;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .login {
+        .mainlogoWrapper {
+            margin: auto;
+            margin-top: 149px;
+            width: 154px;
+            height: 50px;
+            text-align: center;
+            display: block;
+            .mainlogo {
+                width: 100%;
+            }
+        }
+        width: 100%;
+        .loginForm {
+            margin: 0 auto;
+
+            .loginFormTitle {
+                font-size: 30px;
+            }
+        }
+    }
+}

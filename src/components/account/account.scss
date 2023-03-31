@@ -1,0 +1,48 @@
+@import "../../style/variables.scss";
+@import "../../style/mixins.scss";
+
+.account {
+    height: 100vh;
+    width: 100%;
+    .accountForm {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 914px;
+        padding: 30px 25px 30px 25px;
+        margin: auto;
+        .formTitle {
+            font-size: 24px;
+        }
+        .formDetails {
+            padding: 10px;
+            .formDetailsInputs {
+                margin-top: 20px;
+                display: flex;
+                align-items: flex-end;
+                gap: 25px;
+                .photoInput {
+                    border: solid 2px $main-color;
+                    width: 188px;
+                    height: 188px;
+                    border-radius: 50%;
+                }
+                .textInputs {
+                    gap: 20px;
+                    max-width: 631px;
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1 1 auto;
+                    @include text-input-styles;
+                }
+            }
+        }
+        .formChangePassword {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            @include text-input-styles;
+        }
+    }
+}

@@ -1,0 +1,62 @@
+@import "../../style/variables.scss";
+
+.mainbanner {
+    height: 100vh;
+    width: 50%;
+    background-color: $secondary-color;
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .mainlogoWrapper,
+        .mainbannerWrapper {
+            text-align: center;
+        }
+        .mainlogoWrapper {
+            margin-top: 138px;
+            width: 257px;
+            height: 84px;
+            .mainlogo {
+                width: 100%;
+                height: 100%;
+            }
+        }
+        .mainbannerWrapper {
+            width: 577px;
+            height: 403px;
+            margin-top: 92px;
+            .mainbanner {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 1200px) {
+    .mainbanner {
+        .wrapper {
+            .mainbannerWrapper {
+                width: 450px;
+                height: 380px;
+            }
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .mainbanner {
+        .wrapper {
+            .mainbannerWrapper {
+                width: 350px;
+                height: 280px;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .mainbanner {
+        display: none;
+    }
+}
