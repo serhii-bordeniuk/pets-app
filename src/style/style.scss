@@ -7,3 +7,26 @@
     margin: 0;
     padding: 0;
 }
+
+.wrapper {
+    margin-left: 349px;
+    margin-top: 122px;
+}
+
+[class*="Container"] {
+    max-width: 1371px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+@media (max-width: 1200px) {
+    .wrapper {
+        margin-top: 75px;
+    }
+}
+
+@media (max-width: 992px) {
+    .wrapper {
+        margin-left: 0;
+    }
+}

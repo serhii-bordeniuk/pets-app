@@ -6,12 +6,12 @@ import "./MainBanner.scss";
 export const MainBanner = () => {
     return (
         <div className="mainbanner">
-            <div className="wrapper">
+            <div className="mainbannerWrapper">
                 <div className="mainlogoWrapper">
                     <img className="mainlogo" src={mainlogo} alt="logotype" />
                 </div>
-                <div className="mainbannerWrapper">
-                    <img className="mainbanner" src={mainbanner} alt="" />
+                <div className="mainbannerImageWrapper">
+                    <img className="mainbannerImage" src={mainbanner} alt="" />
                 </div>
             </div>
         </div>

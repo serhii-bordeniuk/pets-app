@@ -58,6 +58,7 @@
 
 @media (max-width: 768px) {
     .login {
+        height: 100%;
         .mainlogoWrapper {
             margin: auto;
             margin-top: 149px;
@@ -71,7 +72,7 @@
         }
         width: 100%;
         .loginForm {
-            margin: 0 auto;
+            margin-top: 51px;
 
             .loginFormTitle {
                 font-size: 30px;

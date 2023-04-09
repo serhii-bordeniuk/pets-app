@@ -1,6 +1,7 @@
 import React from "react";
 import "./signup.scss";
 import mainlogo from "../../resources/img/mainlogo.svg";
+import { Link } from "react-router-dom";
 import {
     TextField,
     InputLabel,
@@ -136,11 +137,11 @@ export const Signup: React.FC = (): JSX.Element => {
                 >
                     Submit
                 </Button>
-                <p className="registrationLink">
+                <p className="loginLink">
                     Do you have an account already?{" "}
-                    <a className="registrationLinkButton" href="google.com">
+                    <Link to="/login" className="loginLinkButton">
                         Login
-                    </a>
+                    </Link>
                 </p>
             </form>
         </div>

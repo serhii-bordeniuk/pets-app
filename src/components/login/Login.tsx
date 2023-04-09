@@ -1,5 +1,6 @@
 import React from "react";
 import mainlogo from "../../resources/img/mainlogo.svg";
+import { Link } from "react-router-dom";
 import {
     TextField,
     InputLabel,
@@ -60,7 +61,6 @@ export const Login: React.FC = (): JSX.Element => {
                         variant="outlined"
                         fullWidth
                         onChange={handleChange("email")}
-                        sx={{ mt: 2.5 }}
                         placeholder="Enter your email"
                     />
                 </FormControl>
@@ -100,9 +100,9 @@ export const Login: React.FC = (): JSX.Element => {
                 </Button>
                 <p className="registrationLink">
                     Dont have an account yet?{" "}
-                    <a className="registrationLinkButton" href="###">
+                    <Link to="/signup" className="registrationLinkButton">
                         Register
-                    </a>
+                    </Link>
                 </p>
             </form>
         </div>
