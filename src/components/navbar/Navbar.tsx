@@ -1,6 +1,6 @@
 import React from "react";
 import "./navbar.scss";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import mainlogo from "../../resources/img/mainlogo.svg";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PetsIcon from "@mui/icons-material/Pets";
@@ -13,6 +13,13 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ navbarOpen }) => {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        sessionStorage.removeItem("Auth Token");
+        navigate("/login", { replace: true });
+    };
+
     return (
         <div className={navbarOpen ? "navbar open" : "navbar"}>
             <div className="navbarHeader">
@@ -39,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({ navbarOpen }) => {
                 </nav>
             </div>
             <div className="navbarFooter">
-                <button className="navbarFooterLogout">
+                <button className="navbarFooterLogout" onClick={handleLogout}>
                     {" "}
                     <LogoutIcon /> Log Out
                 </button>

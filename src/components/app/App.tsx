@@ -1,24 +1,28 @@
 import { LoginPage } from "../../pages/loginPage/LoginPage";
 import { SignupPage } from "../../pages/signupPage/SignupPage";
 import { AccountPage } from "../../pages/accountPage/AccountPage";
-import { Navbar } from "../navbar/Navbar";
-import { Header } from "../header/Header";
-import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { Layout } from "../layout/Layout";
+import { AuthRoute } from "../authRoute/AuthRoute";
+
+//to do something with authroute
 
 function App() {
-    const [navbarOpen, setNavbarOpen] = React.useState(false);
-
     return (
-        <div className="App">
-            {/* <Navbar navbarOpen={navbarOpen} />
-            <Header headerTitle="Account" setNavbarOpen={setNavbarOpen} navbarOpen={navbarOpen} /> */}
+        <Layout className="app">
             <Routes>
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/account" element={<AccountPage />} />
+                <Route
+                    path="/account"
+                    element={
+                        <AuthRoute>
+                            <AccountPage />
+                        </AuthRoute>
+                    }
+                />
             </Routes>
-        </div>
+        </Layout>
     );
 }
 

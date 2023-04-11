@@ -1,7 +1,9 @@
 import React from "react";
+import { app } from "../../firebase-config";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import "./signup.scss";
 import mainlogo from "../../resources/img/mainlogo.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
     TextField,
     InputLabel,
@@ -10,6 +12,8 @@ import {
     IconButton,
     FormControl,
     Button,
+    Snackbar,
+    Alert,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -24,6 +28,8 @@ export const Signup: React.FC = (): JSX.Element => {
         showConfirmedPassword: boolean;
     }
 
+    const navigate = useNavigate();
+
     const [credentials, setCredentials] = useState<FormValues>({
         email: "",
         password: "",
@@ -31,6 +37,8 @@ export const Signup: React.FC = (): JSX.Element => {
         showPassword: false,
         showConfirmedPassword: false,
     });
+
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange =
         (prop: keyof FormValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +62,19 @@ export const Signup: React.FC = (): JSX.Element => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log(credentials);
+        const authentication = getAuth(app);
+        createUserWithEmailAndPassword(authentication, credentials.email, credentials.password)
+            .then((response) => {
+                navigate("/account");
+                response.user.getIdTokenResult().then((idTokenResult) => {
+                    sessionStorage.setItem("Auth Token", idTokenResult.token);
+                });
+            })
+            .catch((error) => {
+                if (error.code === "auth/email-already-in-use") {
+                    setError("This Email already in use");
+                }
+            });
     };
 
     return (
@@ -143,6 +163,18 @@ export const Signup: React.FC = (): JSX.Element => {
                         Login
                     </Link>
                 </p>
+                {error && (
+                    <Snackbar
+                        open={true}
+                        autoHideDuration={6000}
+                        onClose={() => setError(null)}
+                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    >
+                        <Alert severity="error" sx={{ width: "100%" }}>
+                            {error}
+                        </Alert>
+                    </Snackbar>
+                )}
             </form>
         </div>
     );

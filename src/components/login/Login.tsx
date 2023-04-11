@@ -1,6 +1,7 @@
 import React from "react";
 import mainlogo from "../../resources/img/mainlogo.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import {
     TextField,
     InputLabel,
@@ -9,6 +10,8 @@ import {
     IconButton,
     FormControl,
     Button,
+    Snackbar,
+    Alert,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -22,11 +25,15 @@ export const Login: React.FC = (): JSX.Element => {
         showPassword: boolean;
     }
 
+    const navigate = useNavigate();
+
     const [credentials, setCredentials] = useState<FormValues>({
         email: "",
         password: "",
         showPassword: false,
     });
+
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange =
         (prop: keyof FormValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +50,21 @@ export const Login: React.FC = (): JSX.Element => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log(credentials);
+        const authentication = getAuth();
+        signInWithEmailAndPassword(authentication, credentials.email, credentials.password)
+            .then((response) => {
+                response.user.getIdTokenResult().then((idTokenResult) => {
+                    sessionStorage.setItem("Auth Token", idTokenResult.token);
+                    navigate("/account");
+                });
+            })
+            .catch((error) => {
+                if (error.code === "auth/user-not-found") {
+                    setError("Check the Email");
+                } else if (error.code === "auth/wrong-password") {
+                    setError("Check the Password");
+                }
+            });
     };
 
     return (
@@ -104,6 +125,18 @@ export const Login: React.FC = (): JSX.Element => {
                         Register
                     </Link>
                 </p>
+                {error && (
+                    <Snackbar
+                        open={true}
+                        autoHideDuration={6000}
+                        onClose={() => setError(null)}
+                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    >
+                        <Alert severity="error" sx={{ width: "100%" }}>
+                            {error}
+                        </Alert>
+                    </Snackbar>
+                )}
             </form>
         </div>
     );
