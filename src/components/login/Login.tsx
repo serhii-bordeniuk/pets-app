@@ -1,11 +1,12 @@
 import React from "react";
 import mainlogo from "../../resources/img/mainlogo.svg";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import {
     TextField,
-    InputLabel,
-    OutlinedInput,
     InputAdornment,
     IconButton,
     FormControl,
@@ -18,40 +19,40 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import "./login.scss";
 import { useState } from "react";
 
-export const Login: React.FC = (): JSX.Element => {
-    interface FormValues {
-        email: string;
-        password: string;
-        showPassword: boolean;
-    }
+interface FormValues {
+    email: string;
+    password: string;
+}
 
+export const Login: React.FC = (): JSX.Element => {
     const navigate = useNavigate();
 
-    const [credentials, setCredentials] = useState<FormValues>({
-        email: "",
-        password: "",
-        showPassword: false,
+    const schema = yup.object().shape({
+        email: yup.string().email().required(),
+        password: yup.string().min(8).max(32).required(),
     });
 
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+    } = useForm<FormValues>({ resolver: yupResolver(schema) });
+
+    const [showPassword, setShowPassword] = React.useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleChange =
-        (prop: keyof FormValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            setCredentials({ ...credentials, [prop]: event.target.value });
-        };
-
     const handleClickShowPassword = () => {
-        setCredentials({ ...credentials, showPassword: !credentials.showPassword });
+        setShowPassword((prevShowPassword) => !prevShowPassword);
     };
 
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const onSubmit = (data: FormValues) => {
         const authentication = getAuth();
-        signInWithEmailAndPassword(authentication, credentials.email, credentials.password)
+        signInWithEmailAndPassword(authentication, data.email, data.password)
             .then((response) => {
                 response.user.getIdTokenResult().then((idTokenResult) => {
                     sessionStorage.setItem("Auth Token", idTokenResult.token);
@@ -65,6 +66,7 @@ export const Login: React.FC = (): JSX.Element => {
                     setError("Check the Password");
                 }
             });
+        reset();
     };
 
     return (
@@ -72,41 +74,45 @@ export const Login: React.FC = (): JSX.Element => {
             <div className="mainlogoWrapper">
                 <img className="mainlogo" src={mainlogo} alt="logotype" />
             </div>
-            <form className="loginForm" onSubmit={handleSubmit}>
+            <form className="loginForm" onSubmit={handleSubmit(onSubmit)} noValidate>
                 <h1 className="loginFormTitle">Log In</h1>
                 <FormControl variant="outlined">
                     <TextField
+                        {...register("email")}
                         id="email-input"
-                        type="text"
+                        type="email"
                         label="Email"
                         variant="outlined"
                         fullWidth
-                        onChange={handleChange("email")}
                         placeholder="Enter your email"
+                        error={errors.email ? true : false}
+                        helperText={errors.email?.message}
                     />
                 </FormControl>
 
                 <FormControl variant="outlined">
-                    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                    <OutlinedInput
+                    <TextField
+                        {...register("password")}
                         id="password-input"
-                        type={credentials.showPassword ? "text" : "password"}
-                        value={credentials.password}
-                        onChange={handleChange("password")}
-                        label="password"
+                        type={showPassword ? "text" : "password"}
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                        label="Password"
                         placeholder="Enter your password"
-                        endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handleClickShowPassword}
-                                    onMouseDown={handleMouseDownPassword}
-                                    edge="end"
-                                >
-                                    {credentials.showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        }
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                 </FormControl>
                 <Button

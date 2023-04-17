@@ -10,7 +10,6 @@ interface LayoutProps {
 
 export const Layout = ({ children, className }: LayoutProps) => {
     const location = useLocation();
-    const navigate = useNavigate();
 
     const [navbarOpen, setNavbarOpen] = useState(false);
 

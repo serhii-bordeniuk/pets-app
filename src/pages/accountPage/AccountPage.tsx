@@ -1,16 +1,19 @@
-import React from "react";
+import { useEffect } from "react";
 import { useAuthorization } from "../../hooks/useAuthorization";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Account } from "../../components/account/Account";
 import "./accountPage.scss";
 
 export const AccountPage = () => {
-    const authorized = useAuthorization();
-    const navigate = useNavigate();
+    // const authorized = useAuthorization();
+    // const navigate = useNavigate();
 
-    if (!authorized) {
-        navigate("/login");
-    }
+    // useEffect(() => {
+    //     if (!authorized) {
+    //         navigate("/login");
+    //     }
+    // }, [navigate, authorized]);
+
     return (
         <div className="accountPage">
             <Account />

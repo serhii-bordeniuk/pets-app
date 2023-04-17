@@ -1,5 +1,9 @@
 import React from "react";
 import { app } from "../../firebase-config";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import "./signup.scss";
 import mainlogo from "../../resources/img/mainlogo.svg";
@@ -17,42 +21,47 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { useState } from "react";
+
+interface FormValues {
+    email: string;
+    password: string;
+    confirmedPassword: string;
+}
 
 export const Signup: React.FC = (): JSX.Element => {
-    interface FormValues {
-        email: string;
-        password: string;
-        confirmedPassword: string;
-        showPassword: boolean;
-        showConfirmedPassword: boolean;
-    }
-
     const navigate = useNavigate();
 
-    const [credentials, setCredentials] = useState<FormValues>({
-        email: "",
-        password: "",
-        confirmedPassword: "",
-        showPassword: false,
-        showConfirmedPassword: false,
+    const schema = yup.object().shape({
+        email: yup.string().email().required(),
+        password: yup.string().min(8).max(32).required(),
+        confirmedPassword: yup
+            .string()
+            .required("confirm password is a required field")
+            .nullable()
+            .test("match", "Passwords must match", function (value) {
+                if (value === null) {
+                    return false;
+                }
+                return value === this.parent.password;
+            }),
     });
 
-    const [error, setError] = useState<string | null>(null);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+    } = useForm<FormValues>({ resolver: yupResolver(schema) });
 
-    const handleChange =
-        (prop: keyof FormValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            setCredentials({ ...credentials, [prop]: event.target.value });
-        };
+    const [showPassword, setShowPassword] = React.useState(false);
+    const [showConfirmedPassword, setShowConfirmedPassword] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleClickShowPassword = (prop: keyof FormValues) => () => {
         if (prop === "password") {
-            setCredentials({ ...credentials, showPassword: !credentials.showPassword });
+            setShowPassword((prevShowPassword) => !prevShowPassword);
         } else {
-            setCredentials({
-                ...credentials,
-                showConfirmedPassword: !credentials.showConfirmedPassword,
-            });
+            setShowConfirmedPassword((prevShowConfirmedPassword) => !prevShowConfirmedPassword);
         }
     };
 
@@ -60,14 +69,13 @@ export const Signup: React.FC = (): JSX.Element => {
         event.preventDefault();
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const onSubmit = (data: FormValues) => {
         const authentication = getAuth(app);
-        createUserWithEmailAndPassword(authentication, credentials.email, credentials.password)
+        createUserWithEmailAndPassword(authentication, data.email, data.password)
             .then((response) => {
-                navigate("/account");
                 response.user.getIdTokenResult().then((idTokenResult) => {
                     sessionStorage.setItem("Auth Token", idTokenResult.token);
+                    navigate("/account");
                 });
             })
             .catch((error) => {
@@ -75,6 +83,7 @@ export const Signup: React.FC = (): JSX.Element => {
                     setError("This Email already in use");
                 }
             });
+        reset();
     };
 
     return (
@@ -82,69 +91,71 @@ export const Signup: React.FC = (): JSX.Element => {
             <div className="mainlogo-wrapper">
                 <img className="mainlogo" src={mainlogo} alt="logotype" />
             </div>
-            <form className="signupForm" onSubmit={handleSubmit}>
+            <form className="signupForm" onSubmit={handleSubmit(onSubmit)} noValidate>
                 <h1 className="signupFormTitle">Sign Up</h1>
                 <FormControl variant="outlined">
                     <TextField
+                        {...register("email")}
                         id="email-input"
-                        type="text"
+                        type="email"
                         label="Email"
                         variant="outlined"
                         fullWidth
-                        onChange={handleChange("email")}
                         placeholder="Enter your email"
+                        error={errors.email ? true : false}
+                        helperText={errors.email?.message}
                     />
                 </FormControl>
 
                 <FormControl variant="outlined">
-                    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                    <OutlinedInput
+                    <TextField
+                        {...register("password")}
                         id="password-input"
-                        type={credentials.showPassword ? "text" : "password"}
-                        value={credentials.password}
-                        onChange={handleChange("password")}
-                        label="password"
+                        type={showPassword ? "text" : "password"}
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                        label="Password"
                         placeholder="Enter your password"
-                        endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handleClickShowPassword("password")}
-                                    onMouseDown={handleMouseDownPassword}
-                                    edge="end"
-                                >
-                                    {credentials.showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        }
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword("password")}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                 </FormControl>
 
                 <FormControl variant="outlined">
-                    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                    <OutlinedInput
+                    <TextField
+                        {...register("confirmedPassword")}
                         id="confirm-password-input"
-                        type={credentials.showConfirmedPassword ? "text" : "password"}
-                        value={credentials.confirmedPassword}
-                        onChange={handleChange("confirmedPassword")}
-                        label="password"
+                        type={showConfirmedPassword ? "text" : "password"}
+                        label="Password"
                         placeholder="Confirm your password"
-                        endAdornment={
-                            <InputAdornment position="end">
-                                <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handleClickShowPassword("confirmedPassword")}
-                                    onMouseDown={handleMouseDownPassword}
-                                    edge="end"
-                                >
-                                    {credentials.showConfirmedPassword ? (
-                                        <VisibilityOff />
-                                    ) : (
-                                        <Visibility />
-                                    )}
-                                </IconButton>
-                            </InputAdornment>
-                        }
+                        error={!!errors.confirmedPassword}
+                        helperText={errors.confirmedPassword?.message}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword("confirmedPassword")}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                    >
+                                        {showConfirmedPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                 </FormControl>
                 <Button
