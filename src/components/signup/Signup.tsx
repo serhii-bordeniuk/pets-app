@@ -2,6 +2,7 @@ import React from "react";
 import { app } from "../../firebase-config";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { getDatabase, ref, set } from "firebase/database";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
@@ -10,8 +11,6 @@ import mainlogo from "../../resources/img/mainlogo.svg";
 import { Link, useNavigate } from "react-router-dom";
 import {
     TextField,
-    InputLabel,
-    OutlinedInput,
     InputAdornment,
     IconButton,
     FormControl,
@@ -30,6 +29,7 @@ interface FormValues {
 
 export const Signup: React.FC = (): JSX.Element => {
     const navigate = useNavigate();
+    const database = getDatabase();
 
     const schema = yup.object().shape({
         email: yup.string().email().required(),
@@ -73,10 +73,18 @@ export const Signup: React.FC = (): JSX.Element => {
         const authentication = getAuth(app);
         createUserWithEmailAndPassword(authentication, data.email, data.password)
             .then((response) => {
-                response.user.getIdTokenResult().then((idTokenResult) => {
-                    sessionStorage.setItem("Auth Token", idTokenResult.token);
-                    navigate("/account");
-                });
+                const userId = response.user.uid;
+                const userDataRef = ref(database, `users/${userId}/email`);
+                set(userDataRef, data.email)
+                    .then(() => {
+                        response.user.getIdTokenResult().then((idTokenResult) => {
+                            sessionStorage.setItem("Auth Token", idTokenResult.token);
+                            navigate("/account");
+                        });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
             })
             .catch((error) => {
                 if (error.code === "auth/email-already-in-use") {

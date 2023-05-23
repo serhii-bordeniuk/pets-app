@@ -1,6 +1,9 @@
 import React from "react";
 import "./account.scss";
 import photoicon from "../../resources/icons/photo_icon.svg";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+
 import {
     Button,
     FormControl,
@@ -11,40 +14,31 @@ import {
     IconButton,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useState } from "react";
+
+interface FormValues {
+    email: string | null | undefined;
+    userName: string;
+    password: string;
+    confirmedPassword: string;
+    telephone: string;
+}
 
 export const Account: React.FC = (): JSX.Element => {
-    interface FormValues {
-        email: string;
-        userName: string;
-        password: string;
-        confirmedPassword: string;
-        showPassword: boolean;
-        showConfirmedPassword: boolean;
-    }
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+    } = useForm<FormValues>();
 
-    const [credentials, setCredentials] = useState<FormValues>({
-        email: "",
-        userName: "",
-        password: "",
-        confirmedPassword: "",
-        showPassword: false,
-        showConfirmedPassword: false,
-    });
-
-    const handleChange =
-        (prop: keyof FormValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            setCredentials({ ...credentials, [prop]: event.target.value });
-        };
+    const [showPassword, setShowPassword] = React.useState(false);
+    const [showConfirmedPassword, setShowConfirmedPassword] = useState(false);
 
     const handleClickShowPassword = (prop: keyof FormValues) => () => {
         if (prop === "password") {
-            setCredentials({ ...credentials, showPassword: !credentials.showPassword });
+            setShowPassword((prevShowPassword) => !prevShowPassword);
         } else {
-            setCredentials({
-                ...credentials,
-                showConfirmedPassword: !credentials.showConfirmedPassword,
-            });
+            setShowConfirmedPassword((prevShowConfirmedPassword) => !prevShowConfirmedPassword);
         }
     };
 
@@ -52,16 +46,15 @@ export const Account: React.FC = (): JSX.Element => {
         event.preventDefault();
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        console.log(credentials);
+    const onSubmit = (data: FormValues) => {
+        console.log(console.log(data));
     };
 
     return (
         <div className="account">
             <div className="wrapper">
                 <div className="accoutnContainer">
-                    <form className="accountForm">
+                    <form className="accountForm" onSubmit={handleSubmit(onSubmit)}>
                         <div className="formDetails">
                             <div className="formTitle">Basic details</div>
                             <div className="formDetailsInputs">
@@ -71,23 +64,23 @@ export const Account: React.FC = (): JSX.Element => {
                                 <div className="textInputs">
                                     <FormControl variant="outlined">
                                         <TextField
+                                            {...register("userName")}
                                             id="fullname-input"
                                             type="text"
                                             label="Full name"
                                             variant="outlined"
                                             fullWidth
-                                            onChange={handleChange("userName")}
                                             placeholder="User name"
                                         />
                                     </FormControl>
                                     <FormControl variant="outlined">
                                         <TextField
+                                            {...register("email")}
                                             id="email-input"
                                             type="text"
                                             label="Email"
                                             variant="outlined"
                                             fullWidth
-                                            onChange={handleChange("email")}
                                             placeholder="example@gmail.com"
                                         />
                                     </FormControl>
@@ -101,10 +94,9 @@ export const Account: React.FC = (): JSX.Element => {
                                     Password
                                 </InputLabel>
                                 <OutlinedInput
+                                    {...register("password")}
                                     id="password-input"
-                                    type={credentials.showPassword ? "text" : "password"}
-                                    value={credentials.password}
-                                    onChange={handleChange("password")}
+                                    type={showPassword ? "text" : "password"}
                                     label="password"
                                     placeholder="Enter your password"
                                     endAdornment={
@@ -115,11 +107,7 @@ export const Account: React.FC = (): JSX.Element => {
                                                 onMouseDown={handleMouseDownPassword}
                                                 edge="end"
                                             >
-                                                {credentials.showPassword ? (
-                                                    <VisibilityOff />
-                                                ) : (
-                                                    <Visibility />
-                                                )}
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
                                             </IconButton>
                                         </InputAdornment>
                                     }
@@ -130,10 +118,9 @@ export const Account: React.FC = (): JSX.Element => {
                                     Password
                                 </InputLabel>
                                 <OutlinedInput
+                                    {...register("confirmedPassword")}
                                     id="confirm-password-input"
-                                    type={credentials.showConfirmedPassword ? "text" : "password"}
-                                    value={credentials.confirmedPassword}
-                                    onChange={handleChange("confirmedPassword")}
+                                    type={showConfirmedPassword ? "text" : "password"}
                                     label="password"
                                     placeholder="Confirm your password"
                                     endAdornment={
@@ -146,7 +133,7 @@ export const Account: React.FC = (): JSX.Element => {
                                                 onMouseDown={handleMouseDownPassword}
                                                 edge="end"
                                             >
-                                                {credentials.showConfirmedPassword ? (
+                                                {showConfirmedPassword ? (
                                                     <VisibilityOff />
                                                 ) : (
                                                     <Visibility />
@@ -158,17 +145,17 @@ export const Account: React.FC = (): JSX.Element => {
                             </FormControl>
                             <FormControl variant="outlined">
                                 <TextField
+                                    {...register("telephone")}
                                     id="phone-input"
                                     type="text"
                                     label="Telephone"
                                     variant="outlined"
                                     fullWidth
-                                    onChange={handleChange("userName")}
                                     placeholder="+380 00 000 00 00"
                                 />
                             </FormControl>
                         </div>
-                        <Button className="button save" variant="contained">
+                        <Button className="button save" variant="contained" type="submit">
                             Save
                         </Button>
                         <div className="formDeleteAcc">
