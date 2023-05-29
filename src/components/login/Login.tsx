@@ -18,6 +18,8 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import "./login.scss";
 import { useState } from "react";
+import { setUser } from "../../slices/userSlice";
+import { useAppDispatch } from "../../hooks/useRedux";
 
 interface FormValues {
     email: string;
@@ -25,6 +27,7 @@ interface FormValues {
 }
 
 export const Login: React.FC = (): JSX.Element => {
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     const schema = yup.object().shape({
@@ -54,10 +57,13 @@ export const Login: React.FC = (): JSX.Element => {
         const authentication = getAuth();
         signInWithEmailAndPassword(authentication, data.email, data.password)
             .then((response) => {
+                const { email } = response.user;
                 response.user.getIdTokenResult().then((idTokenResult) => {
                     sessionStorage.setItem("Auth Token", idTokenResult.token);
+                    dispatch(setUser({ email }));
                     navigate("/account");
                 });
+                reset();
             })
             .catch((error) => {
                 if (error.code === "auth/user-not-found") {
@@ -66,7 +72,6 @@ export const Login: React.FC = (): JSX.Element => {
                     setError("Check the Password");
                 }
             });
-        reset();
     };
 
     return (

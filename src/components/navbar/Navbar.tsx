@@ -7,6 +7,8 @@ import PetsIcon from "@mui/icons-material/Pets";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PaidIcon from "@mui/icons-material/Paid";
+import { useAppDispatch } from "../../hooks/useRedux";
+import { clearUser } from "../../slices/userSlice";
 
 interface NavbarProps {
     navbarOpen: boolean;
@@ -14,10 +16,12 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ navbarOpen }) => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     const handleLogout = () => {
         sessionStorage.removeItem("Auth Token");
         navigate("/login", { replace: true });
+        dispatch(clearUser());
     };
 
     return (

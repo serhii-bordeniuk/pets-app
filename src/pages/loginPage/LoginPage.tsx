@@ -1,6 +1,6 @@
 import React from "react";
 import "./loginPage.scss";
-import { MainBanner } from "../../components/MainBanner/MainBanner";
+import { MainBanner } from "../../components/mainBanner/MainBanner";
 import { Login } from "../../components/login/Login";
 
 export const LoginPage: React.FC = () => {

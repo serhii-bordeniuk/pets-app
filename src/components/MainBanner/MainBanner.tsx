@@ -1,7 +1,7 @@
 import React from "react";
 import mainlogo from "../../resources/img/mainlogo.svg";
 import mainbanner from "../../resources/img/banner_image.svg";
-import "./MainBanner.scss";
+import "./mainBanner.scss";
 
 export const MainBanner = () => {
     return (
